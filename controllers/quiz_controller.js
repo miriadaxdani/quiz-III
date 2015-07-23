@@ -29,14 +29,14 @@ exports.index = function(req,res) {
             order: 'pregunta ASC'
 		}
 	).then(function(quizes) {
-		res.render('quizes/index',{quizes: quizes, search: inputValueSearch});
+		res.render('quizes/index',{quizes: quizes, search: inputValueSearch, errors: []});
 	}).catch(function(error){next(error);});
 };
 
 
 // GET /quizes/:id
 exports.show = function(req,res) {
-	res.render('quizes/show',{quiz: req.quiz});
+	res.render('quizes/show',{quiz: req.quiz, errors: []});
 };
 
 
@@ -46,7 +46,7 @@ exports.answer = function(req,res) {
 	if(req.query.respuesta === req.quiz.respuesta) {
 		resultado = 'Correcto';
 	}
-	res.render('quizes/answer',{quiz: req.quiz, respuesta: resultado});
+	res.render('quizes/answer',{quiz: req.quiz, respuesta: resultado, errors: []});
 };
 
 // GET /quizes/new
@@ -58,22 +58,31 @@ exports.new = function(req,res) {
 		}
 	);
 	
-	res.render('quizes/new',{quiz: quiz});
+	res.render('quizes/new',{quiz: quiz, errors: []});
 };
 
 // POST /quizes/create
 exports.create = function(req,res) {
 	var quiz=models.Quiz.build( req.body.quiz );
-	console.log('OLA: '+req.body.quiz);
 	//guarda en DB los campos pregunta y respuesta de quiz solamente
 	//para evitar ataques desde POST que añadan campos adicionales a la tabla.
-	quiz.save(
-		{
-			fields: ["pregunta","respuesta"]
+	quiz
+	.validate()
+	.then(
+		function(err) {
+			if(err) {
+				res.render('quizes/new',{quiz: quiz, errors: err.errors});
+			}else{
+				quiz.save(
+					{
+						fields: ["pregunta","respuesta"]
+					}
+					).then(function(){
+						res.redirect('/quizes');
+					}	
+				);			
+			}
 		}
-	).then(function(){
-			res.redirect('/quizes');
-		}	
 	);
 };
 
