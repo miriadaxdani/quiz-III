@@ -5,6 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var partials = require('express-partials'); 
+var methodOverrride = require('method-override');
 
 var routes = require('./routes/index');
 
@@ -24,6 +25,7 @@ app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded()); //deprecado, equivale a extend: true
 app.use(bodyParser.urlencoded({ extended: true })); //no aparece el warning de middleware deprecado
 app.use(cookieParser());
+app.use(methodOverrride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes); 
