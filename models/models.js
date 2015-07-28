@@ -44,24 +44,29 @@ sequelize.sync().then(function() {
 	Quiz.count().then(function(count){
 		if(count === 0) { //la tabla se inicializa solo si esta vacia
 			Quiz.create({
-				pregunta: 'Capital de Italia',
-				respuesta: 'Roma'
+				pregunta: 'Autor de la escultura El David',
+				respuesta: 'Miguel Angel',
+				tema: 'humanidades'
 			});
 			Quiz.create({
 				pregunta: 'Capital de Portugal',
-				respuesta: 'Lisboa'
+				respuesta: 'Lisboa',
+				tema: 'otro'
 			});
 			Quiz.create({
-				pregunta: 'Capital de Japón',
-				respuesta: 'Tokio'
+				pregunta: 'Actor que interpreta al décimo Doctor Who',
+				respuesta: 'David Tennant',
+				tema: 'ocio'
 			});
 			Quiz.create({
-				pregunta: 'Capital de Argentina',
-				respuesta: 'Buenos Aires'
+				pregunta: 'La estrella más cercana a la tierra',
+				respuesta: 'Sol',
+				tema: 'ciencia'
 			});			
 			Quiz.create({
-				pregunta: 'Capital de Grecia',
-				respuesta: 'Atenas'
+				pregunta: '¿Qué significan las siglas IA?',
+				respuesta: 'Inteligencia Artificial',
+				tema: 'tecnologia'
 			})			
 			.then(function(){console.log('Base de datos inicializada');});
 		}

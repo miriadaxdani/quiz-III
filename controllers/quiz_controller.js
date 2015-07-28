@@ -53,29 +53,38 @@ exports.answer = function(req,res) {
 exports.new = function(req,res) {
 	var quiz=models.Quiz.build( //crea objeto quiz
 		{
-			pregunta: "Pregunta",
-			respuesta: "Respuesta"
+			pregunta:   "Pregunta",
+			respuesta:  "Respuesta",
+			tema:		"otro"
 		}
 	);
 	
-	res.render('quizes/new',{quiz: quiz, errors: []});
+	var pintarOpcion = { otro: "", humanidades: "", ocio: "", ciencia: "", tecnologia:""}; 
+	res.render('quizes/new',{quiz: quiz, errors: [], selected: pintarOpcion});
 };
 
 // POST /quizes/create
 exports.create = function(req,res) {
+	var pintarOpcion = { otro: "", humanidades: "", ocio: "", ciencia: "", tecnologia:""};
 	var quiz=models.Quiz.build( req.body.quiz );
 	//guarda en DB los campos pregunta y respuesta de quiz solamente
 	//para evitar ataques desde POST que añadan campos adicionales a la tabla.
+	//para evitar que añadan temas adicionales
+	var tema =  quiz.tema;
+	if(tema !== "otro" && tema !== "humanidades" && tema !== "ocio" && tema !== "ciencia" && tema !== "tecnologia") {
+		quiz.tema="otro";
+	}
+	
 	quiz
 	.validate()
 	.then(
 		function(err) {
 			if(err) {
-				res.render('quizes/new',{quiz: quiz, errors: err.errors});
+				res.render('quizes/new',{quiz: quiz, errors: err.errors, selected: pintarOpcion});
 			}else{
 				quiz.save(
 					{
-						fields: ["pregunta","respuesta"]
+						fields: ["pregunta","respuesta","tema"]
 					}
 					).then(function(){
 						res.redirect('/quizes');
@@ -89,26 +98,35 @@ exports.create = function(req,res) {
 // GET /quizes/:id/edit
 exports.edit = function(req, res) {
 	var quiz = req.quiz; //Autoload de instancia de quiz
+	var pintarOpcion = { otro: "", humanidades: "", ocio: "", ciencia: "", tecnologia:""}; 
 	
-	res.render('quizes/edit', {quiz: quiz, errors: []});
+	res.render('quizes/edit', {quiz: quiz, errors: [], selected: pintarOpcion});
 };
 
 
 // PUT /quizes/:id
 exports.update = function(req, res) {
+	var pintarOpcion = { otro: "", humanidades: "", ocio: "", ciencia: "", tecnologia:""};
 	req.quiz.pregunta = req.body.quiz.pregunta;
 	req.quiz.respuesta = req.body.quiz.respuesta;
+	req.quiz.tema = req.body.quiz.tema;
+	
+	//para evitar que nos cambien el tema por uno que no tenemos en el componente html select
+	var tema = req.quiz.tema;
+	if(tema !== "otro" && tema !== "humanidades" && tema !== "ocio" && tema !== "ciencia" && tema !== "tecnologia") {
+		req.quiz.tema="otro";
+	}
 
 	req.quiz
 	.validate()
 	.then(
 		function(err) {
 			if(err) {
-				res.render('quizes/edit',{quiz: req.quiz, errors: err.errors});
+				res.render('quizes/edit',{quiz: req.quiz, errors: err.errors, selected: pintarOpcion});
 			}else{
 				req.quiz.save(
 					{
-						fields: ["pregunta","respuesta"]
+						fields: ["pregunta","respuesta", "tema"]
 					}
 					).then(function(){
 						res.redirect('/quizes');
